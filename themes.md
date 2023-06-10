@@ -15,6 +15,10 @@
 5. "Функциональное программирование" Евгений Владимирович.
 6. "Метапрограммирование".
 
+## Rust
+1. "Asynchronous Programming in Rust".
+2. "Rust for Rustaceans" Jon Gjengset
+
 ## Священное
 1. Анастасия.
 2. Библия.
