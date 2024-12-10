@@ -1,23 +1,17 @@
-# notes
-## ER
-Note(id, name, text, create_date, modified_date, author_id)
+# Пояснительная записка
+## Кому нужна разрабатываемая программа, как она будет использоваться
+Это программа для ведения заметок. Заметки хранятся в программе (её базе данных).
+Заметки могут иметь теги и связи с другими заметками. А также существует понятие
+пользователя и группы пользователей, которые имеют права на чтение и редактирование
+заметок.
 
-Tag(id, name, description)
+Может использоваться, например, it-компанией, в которой имеется несколько команд, 
+которые в данной программе моделируются через группы. Также управляющие должности
+могут принадлежать нескольким группам, чтобы координировать их работу. Через заметки компания
+может вести базу знаний проекта.
 
-Taged(note_id, tag_id)
-
-Link(a_note_id, b_note_id)
-
-Person(id, login, password)
-
-Group(id, name, description)
-
-Member(group_id, person_id)
-
-Permission(note_id, group_id, permission)
-
-
-## CLI
+## Функциональные требования
+### CLI
 Если где-то есть add, то подразумевается и delete.
 - Регистрация: ``notes up <login> <password>``
 - Вход: ``notes in <login> <password>``
@@ -36,6 +30,51 @@ Permission(note_id, group_id, permission)
 - Добавить право группе: ``notes permission add <group_name> <permission>``
   Ошибка, если у того, кто добавляет право, ни в одной его группе нет большего или равного права на этот файл.
 
-## Права
+### Права
 - 0 - чтение.
 - 1 - запись.
+
+## БД
+### ER
+Note(name, text, create_date, modified_date, author_login)
+
+Tag(name, description, note_name)
+
+Link(a_note_name, b_note_name)
+
+Person(login, password)
+
+Group(name, description, person_login)
+
+Permission(note_name, group_name, permission)
+
+### Ограничения
+- Name у note, tag, group уникальны.
+- Login у person уникален.
+- Note_name у tag может быть 0 или больше.
+- Person_login у group может быть 1 или больше.
+- Link - это отношение многие ко многим: n\:m.
+
+### Причины, по которым не нормализованная БД - это плохо
+Такая схема плоха, так как, например, если мы захотим
+изменить имя записки, придётся изменять почти всю БД, и мы вообще можем где-нибудь
+забыть поменять имя, и образуется аномалия.
+
+### Нормализованная ER
+Note(id (PK), name, text, create_date, modified_date, author_id (FK))
+
+Tag(id (PK), name, description)
+
+Taged(note_id (PK, FK), tag_id (PK, FK))
+
+Link(a_note_id (PK, FK), b_note_id (PK, FK))
+
+Person(id (PK), login, password)
+
+Group(id (PK), name, description)
+
+Member(group_id (PK, FK), person_id (PK, FK))
+
+Permission(note_id (PK, FK), group_id (PK, FK), permission)
+
+
