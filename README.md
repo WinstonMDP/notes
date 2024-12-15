@@ -229,3 +229,33 @@ ON CONFLICT (name) DO NOTHING;
 ```sql
 DELETE FROM Tag WHERE name = '<name>';
 ```
+
+``notes tag modify <tag_name> <new_tag_name> <new_tag_description>``:
+```sql
+UPDATE Tag
+SET name = '<new_tag_name>', description = '<new_tag_description>'
+WHERE name = '<tag_name>';
+```
+
+``notes tag <note_name> <tag_name>``:
+```sql
+INSERT INTO Taged (note_id, tag_id)
+SELECT n.id, t.id
+FROM Note n
+JOIN Tag t ON t.name = '<tag_name>'
+WHERE n.name = '<note_name>'
+  AND n.author_id = (
+      SELECT id FROM Person WHERE login = '<login>'
+  )
+ON CONFLICT DO NOTHING;
+```
+
+``notes untag <note_name> <tag_name>``:
+```sql
+DELETE FROM Taged
+USING Note n, Tag t
+WHERE Taged.note_id = n.id
+  AND Taged.tag_id = t.id
+  AND n.name = '<note_name>'
+  AND t.name = '<tag_name>';
+```
