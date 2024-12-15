@@ -100,7 +100,7 @@ CREATE TABLE Person (
     password VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE "Group" (
+CREATE TABLE Group (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) UNIQUE NOT NULL,
     description TEXT
