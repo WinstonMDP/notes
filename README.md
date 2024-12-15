@@ -77,4 +77,67 @@ Member(group_id (PK, FK), person_id (PK, FK))
 
 Permission(note_id (PK, FK), group_id (PK, FK), permission)
 
+### DDL
+```sql
+CREATE TABLE Person (
+    id SERIAL PRIMARY KEY,
+    login VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL
+);
 
+CREATE TABLE "Group" (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT
+);
+
+CREATE TABLE Note (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    text TEXT NOT NULL,
+    create_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modified_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    author_id INTEGER NOT NULL,
+    FOREIGN KEY (author_id) REFERENCES Person(id) ON DELETE CASCADE
+);
+
+CREATE TABLE Tag (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT
+);
+
+CREATE TABLE Member (
+    group_id INTEGER NOT NULL,
+    person_id INTEGER NOT NULL,
+    PRIMARY KEY (group_id, person_id),
+    FOREIGN KEY (group_id) REFERENCES "Group"(id) ON DELETE CASCADE,
+    FOREIGN KEY (person_id) REFERENCES Person(id) ON DELETE CASCADE
+);
+
+CREATE TABLE Taged (
+    note_id INTEGER NOT NULL,
+    tag_id INTEGER NOT NULL,
+    PRIMARY KEY (note_id, tag_id),
+    FOREIGN KEY (note_id) REFERENCES Note(id) ON DELETE CASCADE,
+    FOREIGN KEY (tag_id) REFERENCES Tag(id) ON DELETE CASCADE
+);
+
+CREATE TABLE Link (
+    a_note_id INTEGER NOT NULL,
+    b_note_id INTEGER NOT NULL,
+    PRIMARY KEY (a_note_id, b_note_id),
+    FOREIGN KEY (a_note_id) REFERENCES Note(id) ON DELETE CASCADE,
+    FOREIGN KEY (b_note_id) REFERENCES Note(id) ON DELETE CASCADE,
+    CHECK (a_note_id <> b_note_id) -- Предотвращает связь заметки с самой собой
+);
+
+CREATE TABLE Permission (
+    note_id INTEGER NOT NULL,
+    group_id INTEGER NOT NULL,
+    permission INTEGER NOT NULL CHECK (permission IN (0, 1)),
+    PRIMARY KEY (note_id, group_id),
+    FOREIGN KEY (note_id) REFERENCES Note(id) ON DELETE CASCADE,
+    FOREIGN KEY (group_id) REFERENCES "Group"(id) ON DELETE CASCADE
+);
+```
