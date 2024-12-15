@@ -173,3 +173,35 @@ CREATE TABLE Permission (
     FOREIGN KEY (group_id) REFERENCES "Group"(id) ON DELETE CASCADE
 );
 ```
+
+### SQL-запросы
+``notes up <login> <password>``:
+```sql
+INSERT INTO Person (login, password)
+SELECT '<login>', '<password>'
+WHERE NOT EXISTS (
+    SELECT 1 FROM Person WHERE login = '<login>'
+);
+```
+
+``notes down <login> <password>``:
+```sql
+DELETE FROM Person WHERE login = '<login>';
+```
+
+``notes in <login> <password>``:
+```sql
+SELECT id FROM Person
+WHERE login = '<login>' AND password = '<password>';
+```
+
+``notes add <note_name> <text>``:
+```sql
+INSERT INTO Note (name, text, author_id)
+SELECT '<note_name>', '<text>', (
+    SELECT id FROM Person WHERE login = '<login>'
+)
+WHERE NOT EXISTS (
+    SELECT 1 FROM Note WHERE name = '<note_name>'
+);
+```
