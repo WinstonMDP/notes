@@ -259,3 +259,92 @@ WHERE Taged.note_id = n.id
   AND n.name = '<note_name>'
   AND t.name = '<tag_name>';
 ```
+
+``notes link add <a_note_name> <b_note_name>``:
+```sql
+INSERT INTO Link (a_note_id, b_note_id)
+SELECT n1.id, n2.id
+FROM Note n1
+JOIN Note n2 ON n1.name = '<a_note_name>' AND n2.name = '<b_note_name>'
+WHERE n1.id <> n2.id
+ON CONFLICT DO NOTHING;
+```
+
+``notes link delete <a_note_name> <b_note_name>``:
+```sql
+DELETE FROM Link
+WHERE a_note_id = (
+    SELECT id FROM Note WHERE name = '<a_note_name>'
+)
+AND b_note_id = (
+    SELECT id FROM Note WHERE name = '<b_note_name>'
+);
+```
+
+``notes group add <name> <description>``:
+```sql
+WITH new_group AS (
+    INSERT INTO "Group" (name, description)
+    VALUES ('<name>', '<description>')
+    RETURNING id
+)
+INSERT INTO Member (group_id, person_id)
+SELECT new_group.id, p.id
+FROM new_group, Person p
+WHERE p.login = '<creator_login>';
+```
+
+``notes group delete <name> <description>``:
+```sql
+DELETE FROM "Group" WHERE name = '<name>';
+```
+
+``notes group modify <group_name> <new_group_name> <new_group_description>``:
+```sql
+UPDATE "Group"
+SET name = '<new_group_name>', description = '<new_group_description>'
+WHERE name = '<group_name>';
+```
+
+``notes member add <group_name> <login>``:
+```sql
+INSERT INTO Member (group_id, person_id)
+SELECT g.id, p.id
+FROM "Group" g
+JOIN Person p ON p.login = '<login>'
+WHERE g.name = '<group_name>'
+ON CONFLICT DO NOTHING;
+```
+
+``notes member delete <group_name> <login>``:
+```sql
+DELETE FROM Member
+WHERE group_id = (
+    SELECT id FROM "Group" WHERE name = '<group_name>'
+)
+AND person_id = (
+    SELECT id FROM Person WHERE login = '<login>'
+);
+```
+
+``notes permission add <note_name> <group_name> <permission>``:
+```sql
+INSERT INTO Permission (note_id, group_id, permission)
+SELECT n.id, g.id, <permission>
+FROM Note n
+JOIN "Group" g ON g.name = '<group_name>'
+WHERE n.name = '<note_name>'
+ON CONFLICT (note_id, group_id) DO UPDATE
+SET permission = <permission>;
+```
+
+``notes permission delete <note_name> <group_name> <permission>``:
+```sql
+DELETE FROM Permission
+WHERE note_id = (
+    SELECT id FROM Note WHERE name = '<note_name>'
+)
+AND group_id = (
+    SELECT id FROM "Group" WHERE name = '<group_name>'
+);
+```
