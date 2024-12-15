@@ -97,7 +97,7 @@ Note(id (PK), name, text, create_date, modified_date, author_id (FK))
 
 Tag(id (PK), name, description)
 
-Taged(note_id (PK, FK), tag_id (PK, FK))
+Tagged(note_id (PK, FK), tag_id (PK, FK))
 
 Link(a_note_id (PK, FK), b_note_id (PK, FK))
 
@@ -117,7 +117,7 @@ CREATE TABLE Person (
     password VARCHAR(50) NOT NULL
 );
 
-CREATE TABLE Group (
+CREATE TABLE "Group" (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) UNIQUE NOT NULL,
     description TEXT
@@ -139,7 +139,7 @@ CREATE TABLE Tag (
     description TEXT
 );
 
-CREATE TABLE Taged (
+CREATE TABLE Tagged (
     note_id INTEGER NOT NULL,
     tag_id INTEGER NOT NULL,
     PRIMARY KEY (note_id, tag_id),
@@ -239,7 +239,7 @@ WHERE name = '<tag_name>';
 
 ``notes tag <note_name> <tag_name>``:
 ```sql
-INSERT INTO Taged (note_id, tag_id)
+INSERT INTO Tagged (note_id, tag_id)
 SELECT n.id, t.id
 FROM Note n
 JOIN Tag t ON t.name = '<tag_name>'
@@ -252,10 +252,10 @@ ON CONFLICT DO NOTHING;
 
 ``notes untag <note_name> <tag_name>``:
 ```sql
-DELETE FROM Taged
+DELETE FROM Tagged
 USING Note n, Tag t
-WHERE Taged.note_id = n.id
-  AND Taged.tag_id = t.id
+WHERE Tagged.note_id = n.id
+  AND Tagged.tag_id = t.id
   AND n.name = '<note_name>'
   AND t.name = '<tag_name>';
 ```
