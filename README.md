@@ -205,3 +205,27 @@ WHERE NOT EXISTS (
     SELECT 1 FROM Note WHERE name = '<note_name>'
 );
 ```
+
+``notes delete <note_name> <text>``:
+```sql
+DELETE FROM Note WHERE name = '<note_name>';
+```
+
+``notes modify <note_name> <text>``:
+```sql
+UPDATE Note
+SET text = '<text>', modified_date = CURRENT_TIMESTAMP
+WHERE name = '<note_name>';
+```
+
+``notes tag add <name> <description>``:
+```sql
+INSERT INTO Tag (name, description)
+VALUES ('<name>', '<description>')
+ON CONFLICT (name) DO NOTHING;
+```
+
+``notes tag delete <name> <description>``:
+```sql
+DELETE FROM Tag WHERE name = '<name>';
+```
