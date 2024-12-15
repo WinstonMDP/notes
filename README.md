@@ -96,20 +96,20 @@ Permission(note_id (PK, FK), group_id (PK, FK), permission)
 ```sql
 CREATE TABLE Person (
     id SERIAL PRIMARY KEY,
-    login VARCHAR(50) UNIQUE NOT NULL,
+    login VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE "Group" (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
+    name VARCHAR(255) UNIQUE NOT NULL,
     description TEXT
 );
 
 CREATE TABLE Note (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    text TEXT NOT NULL,
+    name VARCHAR(255) UNIQUE NOT NULL,
+    text TEXT,
     create_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modified_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     author_id INTEGER NOT NULL,
@@ -118,16 +118,8 @@ CREATE TABLE Note (
 
 CREATE TABLE Tag (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
+    name VARCHAR(255) UNIQUE NOT NULL,
     description TEXT
-);
-
-CREATE TABLE Member (
-    group_id INTEGER NOT NULL,
-    person_id INTEGER NOT NULL,
-    PRIMARY KEY (group_id, person_id),
-    FOREIGN KEY (group_id) REFERENCES "Group"(id) ON DELETE CASCADE,
-    FOREIGN KEY (person_id) REFERENCES Person(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Taged (
@@ -144,7 +136,15 @@ CREATE TABLE Link (
     PRIMARY KEY (a_note_id, b_note_id),
     FOREIGN KEY (a_note_id) REFERENCES Note(id) ON DELETE CASCADE,
     FOREIGN KEY (b_note_id) REFERENCES Note(id) ON DELETE CASCADE,
-    CHECK (a_note_id <> b_note_id) -- Предотвращает связь заметки с самой собой
+    CHECK (a_note_id <> b_note_id)
+);
+
+CREATE TABLE Member (
+    group_id INTEGER NOT NULL,
+    person_id INTEGER NOT NULL,
+    PRIMARY KEY (group_id, person_id),
+    FOREIGN KEY (group_id) REFERENCES "Group"(id) ON DELETE CASCADE,
+    FOREIGN KEY (person_id) REFERENCES Person(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Permission (
